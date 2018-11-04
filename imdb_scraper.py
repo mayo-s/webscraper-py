@@ -25,5 +25,6 @@ for link in links:
 	}
 	upcoming_movies.append(movie)
 
-print (upcoming_movies)
+for movie in upcoming_movies:
+	print(movie)
 
