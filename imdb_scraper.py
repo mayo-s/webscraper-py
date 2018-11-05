@@ -19,6 +19,8 @@ upcoming_movies = []
 for link in links:
 	title = link.text
 	url = link['href']
+	if not url.startswith('http'):
+		url = 'https://www.imdb.com' + url
 	movie = {
 		'title' :title,
 		'url' :url
