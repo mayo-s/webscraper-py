@@ -1,5 +1,6 @@
 import urllib.request
 from bs4 import BeautifulSoup
+import json
 
 url = 'http://www.imdb.com/calendar?region=DE&ref_=rlm'
 
@@ -27,6 +28,11 @@ for link in links:
 	}
 	upcoming_movies.append(movie)
 
+# write data to json file
+with open('imdb_data.json', 'w') as outfile:
+	json.dump(upcoming_movies, outfile, indent=4)
+
+# print scraped data
 for movie in upcoming_movies:
 	print(movie)
 
