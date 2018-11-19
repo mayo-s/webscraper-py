@@ -4,6 +4,10 @@ Playing around with webscraper technologies using Python3 and BeautifulSoup4.
 Targeting imdb.com/calendar to scrape names, links and release dates of upcoming movies.
 Scraped data will be written to a json file in project folder.
 
+Here is an example of what the scraped data looks like
+
+![alt text](https://github.com/mayo-s/webscraper-py/blob/master/sample_print.png)
+
 Sample Setup (using terminal - follow on your own risk ;-) )
 - (install python3 if not already done > brew install python)
 - move to your project folder > cd "path/projectFolder"
