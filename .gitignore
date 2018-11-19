@@ -1,6 +1,8 @@
-# internal setup and macOS stuff
+# project and macOS stuff
 .DS_Store
 /bin/
+*.swp
+imdb_data.json
 
 # pip
 pip-selfcheck.json
