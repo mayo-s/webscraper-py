@@ -4,12 +4,33 @@ import json
 
 initial_url = 'http://www.imdb.com/calendar?region=DE&ref_=rlm'
 
+def soup_maker(url){
 # download URL and extract content
-request = urllib.request.Request(initial_url)
-html = urllib.request.urlopen(request).read()
+	request = urllib.request.Request(initial_url)
+	html = urllib.request.urlopen(request).read()
 
-# pass HTML to BeautifulSoup
-soup = BeautifulSoup(html, 'html.parser')
+	# pass HTML to BeautifulSoup
+	soup = BeautifulSoup(html, 'html.parser')
+	return soup
+}
+
+# extract specific movie information
+def parse_movie(url):
+	soup = soup_maker(url)
+	info = soup.find('div', attrs={'class':'subtext'})
+	genre = info.find_all('a', attrs={'href':'genre'})
+	length = info.find('time').text
+	release_date = info.find('a', attrs={'title':'release'}).text
+	
+	data = {
+		'genre':genre,
+		'release_date':release_date,
+		'length':length
+	}
+	return data
+
+# scrape calendar
+soup = soup_maker(initial_url)
 calendar = soup.find('div', attrs={'id':'main'})
 links = calendar.find_all('a')
 
@@ -20,7 +41,7 @@ for link in links:
 	url = link['href']
 	if not url.startswith('http'):
 		url = 'https://www.imdb.com' + url
-	info = parse_movie(url)
+	info = parse_movie(url))
 	movie = {
 		'title' :title,
 		'url' :url,
@@ -38,17 +59,4 @@ with open('imdb_data.json', 'w') as outfile:
 for movie in upcoming_movies:
 	print(movie)
 
-# extract specific movie information
-def parse_movie(url):
-	request = urllib.request(url)
-	html = urllib.request.urlopen(requext).read()
-	soup = BeautifulSoup(html, 'html.parser')
-	info = soup.find('div', attrs={'class':'subtext'})
-
-	genre = info.find_all('a', attrs={'href':'genre'})
-	length = info.find('time').text
-	release_date = info.find('a', attrs={'title':'release'}).text
-	
-	data.append({'genre':genre, 'release_date':release_date, 'length':length})
-	return data
 
