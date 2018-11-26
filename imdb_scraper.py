@@ -30,7 +30,7 @@ def parse_movie(url):
     # not all movies have a rating yet
     # rating = ...
     release_date = subtext.find('a', attrs={'title':'See more release dates'}).text
-    genres = subtext.select('a[href*=genres]')      
+    genres = subtext.select('a[href*=genres]')
     genre_text = []
     for genre in genres:
         text = genre.text
@@ -43,15 +43,21 @@ def parse_movie(url):
         }
     return data
 
-# from each link extract text of link and link itself
+# from each link extract text of link, id and link itself
 upcoming_movies = []
 for link in links:
     title = link.text
     url = link['href']
+
+    #extract unique movie id from url (/title/tt<id>/?ref_=rlm)
+    id = url.split('/')[2]
+    id = id.replace('tt', '')
+
     if not url.startswith('http'):
         url = 'https://www.imdb.com' + url
     info = parse_movie(url)
     movie = {
+        'id':id,
         'title':title,
         'url':url,
         'genres':info.get('genres'),
@@ -93,4 +99,3 @@ def print_all_data():
 
 print_statistics()
 # print_all_data()
-
