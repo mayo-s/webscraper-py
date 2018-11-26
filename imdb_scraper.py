@@ -34,7 +34,7 @@ def parse_movie(url):
     genre_text = []
     for genre in genres:
         text = genre.text
-        genre_text.append(text[1:-1])
+        genre_text.append(text)
         data = {
         #    'rating':rating,
             'genres':genre_text,
