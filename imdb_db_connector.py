@@ -1,4 +1,6 @@
 import mysql.connector
+import datetime
+import json
 
 db = mysql.connector.connect(
     host="localhost",
@@ -8,23 +10,34 @@ db = mysql.connector.connect(
     )   
 dbc = db.cursor()
 
-# INSERT new (complete) movie dataset
-def insert_all(title, genres, url, release_date):
-    sql = "INSERT INTO movies (title, genres, url, release_date) VALUES (%s, %s, %s, %s)"
-    val = (title, "", url, release_date)
+# INSERT new movie dataset
+def insert_movie(title, imdb_id, url, release_date):
+    sql = "INSERT INTO movies (title,imdb_id, url, release_date) VALUES (%s, %s, %s, %s)"
+    val = (title, imdb_id, url, release_date)
     try:
         dbc.execute(sql, val)
         db.commit()
         print ("INSERT successful")
-    except mysql.errors.OperationalError:
-        print("error")
+    except mysql.connector.errors.OperationalError:
+        print("Error: INSERT movie")
 
-title = "The Girl in the Spider's Web: A New Dragon Tattoo Story"
-genres = ["Crime", "Drama", "Thriller"]
-url =  "https://www.imdb.com/title/tt5177088/?ref_=rlm"
-release_date =  "22 November 2018"
+def json_read(filename):
+    with open(filename) as movies:
+        data = json.load(movies)
+    return data
 
-insert_all(title, genres, url, release_date)
+# INSERT all movies from scraped json file
+def insert_movies():
+    upcoming_movies = json_read('imdb_data.json')
+    for movie in upcoming_movies:
+        title = movie.get('title')
+        imdb_id = movie.get('imdb_id')
+        url = movie.get('url')
+        # release_date.get('release_date')
+        release_date = datetime.datetime(2037,3,1) # dummy date
+        insert_movie(title, imdb_id, url, release_date)
+
+insert_movies()
 
 db.close()
 
