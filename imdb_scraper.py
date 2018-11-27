@@ -52,7 +52,7 @@ def parse_movie(url):
 
 # from each link extract text of link, id and link itself
 upcoming_movies = []
-for link in links[:5]:
+for link in links:
     title = link.text
     url = link['href']
 
