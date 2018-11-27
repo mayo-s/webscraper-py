@@ -2,6 +2,7 @@ import urllib.request
 from bs4 import BeautifulSoup
 import json
 import time
+from datetime import datetime
 
 start = time.time()
 initial_url = 'http://www.imdb.com/calendar?region=DE&ref_=rlm'
@@ -29,8 +30,15 @@ def parse_movie(url):
     # length = subtext.find('time').text
     # not all movies have a rating yet
     # rating = ...
-    release_date = subtext.find('a', attrs={'title':'See more release dates'}).text
-    genres = subtext.select('a[href*=genres]')      
+
+    release_date_string = subtext.find('a', attrs={'title':'See more release dates'}).text
+    #cut off (<country name>)
+    release_date_string = release_date_string.split(' ')
+    release_date_string = release_date_string[0] + ' ' + release_date_string[1] + ' ' + release_date_string[2]
+    #parse date string (d Month YYYY) to datetime object
+    release_date = datetime.strptime(release_date_string, '%d %B %Y')
+
+    genres = subtext.select('a[href*=genres]')
     genre_text = []
     for genre in genres:
         text = genre.text
@@ -38,7 +46,7 @@ def parse_movie(url):
         data = {
         #    'rating':rating,
             'genres':genre_text,
-            'release_date':release_date[:16],
+            'release_date':release_date,
         #   'length':length
         }
     return data
@@ -64,7 +72,7 @@ for link in links:
 
 # write data to json file
 with open('imdb_data.json', 'w') as outfile:
-    json.dump(upcoming_movies, outfile, indent=4)
+    json.dump(upcoming_movies, outfile, indent=4, default=str)
 
 def time_format(num):
     return ('%.1f' % num).rstrip('0').rstrip('.')
@@ -93,4 +101,3 @@ def print_all_data():
 
 print_statistics()
 # print_all_data()
-
