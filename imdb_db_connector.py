@@ -34,8 +34,7 @@ def insert_all_movies():
         title = movie.get('title')
         imdb_id = movie.get('imdb_id')
         url = movie.get('url')
-        # release_date.get('release_date')
-        release_date = datetime.datetime(2037,3,1) # dummy date
+        release_date = movie.get('release_date')
         insert_movie(title, imdb_id, url, release_date)
     print ("INSERT successful")
 
@@ -59,8 +58,8 @@ def select_all():
     except mysql.connector.errors.OperationalError:
         print("Error: SELECT * ")
 
-# insert_all_movies()
-select_all()
+insert_all_movies()
+# select_all()
 
 db.close()
 
