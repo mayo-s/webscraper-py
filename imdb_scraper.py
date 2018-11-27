@@ -16,6 +16,7 @@ def soup_maker(url):
     return soup
 
 # scrape calendar
+print ("IMDb Calendar scraping in progress... ")
 soup = soup_maker(initial_url)
 calendar = soup.find('div', attrs={'id':'main'})
 links = calendar.find_all('a')
@@ -51,6 +52,7 @@ def parse_movie(url):
     return data
 
 # from each link extract text of link, id and link itself
+print ('Movie scraping in progress... ')
 upcoming_movies = []
 for link in links:
     title = link.text
@@ -78,6 +80,7 @@ for link in links:
 # write data to json file
 with open('imdb_data.json', 'w') as outfile:
     json.dump(upcoming_movies, outfile, indent=4, default=str)
+print('Scraped data dumped into imdb_data.json')
 
 def time_format(num):
     return ('%.1f' % num).rstrip('0').rstrip('.')
