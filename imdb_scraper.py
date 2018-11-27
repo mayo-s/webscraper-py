@@ -45,19 +45,19 @@ def parse_movie(url):
 
 # from each link extract text of link, id and link itself
 upcoming_movies = []
-for link in links:
+for link in links[:5]:
     title = link.text
     url = link['href']
 
     #extract unique movie id from url (/title/tt<id>/?ref_=rlm)
-    id = url.split('/')[2]
-    id = id.replace('tt', '')
+    imdb_id = url.split('/')[2]
+    imdb_id = imdb_id.replace('tt', '')
 
     if not url.startswith('http'):
         url = 'https://www.imdb.com' + url
     info = parse_movie(url)
     movie = {
-        'id':id,
+        'imdb_id':imdb_id,
         'title':title,
         'url':url,
         'genres':info.get('genres'),
