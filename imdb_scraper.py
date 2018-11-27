@@ -4,7 +4,7 @@ import json
 import time
 
 start = time.time()
-initial_url = 'http://www.imdb.com/calendar?region=DE&ref_=rlm'
+initial_url = 'http://www.imdb.com/calendar?region=DE&ref_=rlm' # imdb calendar (Germany)
 
 def soup_maker(url):
     # download URL and extract content
@@ -80,6 +80,7 @@ def print_statistics():
     text = '#### Time needed: ' + str(t) + ' secs ####'
     print (text)
     print ('#################################')
+    print('')
 
 # print scraped data
 def print_all_data():
