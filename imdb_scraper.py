@@ -65,13 +65,14 @@ def parse_movie(url):
         }
     return data
 
+# extract cast names of given movie
 def parse_cast(url):
     soup = soup_maker(url)
     cast_table = soup.find('table', attrs={'class':'cast_list'})
-    table_rows = cast_table.find_all('tr')
+    table_rows = cast_table.find_all('tr', attrs={'class': True})
 
     cast_names = []
-    for row in table_rows[2:]:
+    for row in table_rows:
         name = row.find('td').find_next('td').text
         name = name.replace('\n ','')
         cast_names.append(name)
