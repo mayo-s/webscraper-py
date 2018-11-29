@@ -32,14 +32,17 @@ def parse_movie(url):
     # not all movies have a rating yet
     # rating = ...
     release_date_string = subtext.find('a', attrs={'title':'See more release dates'}).text
-    #cut off (<country name>)
+    # cut off (<country name>)
     release_date_string = release_date_string.split(' ')
     release_date_string = release_date_string[0] + ' ' + release_date_string[1] + ' ' + release_date_string[2]
-    #parse date string (d Month YYYY) to datetime object
+    # parse date string (d Month YYYY) to datetime object
     release_date = datetime.strptime(release_date_string, '%d %B %Y')
-
     poster_div = soup.find('div', attrs={'class':'poster'})
-    poster_url = poster_div.find('img').src
+    if poster_div is not None:
+        poster = poster_div.find('img')
+        poster_url = poster['src']
+    else:
+        poster_url = ''
 
     genres = subtext.select('a[href*=genres]')
     genre_text = []
