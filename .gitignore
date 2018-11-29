@@ -2,7 +2,8 @@
 .DS_Store
 /bin/
 *.swp
-imdb_data.json
+*.json
+.db_pref.cnf
 
 # pip
 pip-selfcheck.json
