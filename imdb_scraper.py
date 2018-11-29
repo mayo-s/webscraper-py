@@ -38,6 +38,9 @@ def parse_movie(url):
     #parse date string (d Month YYYY) to datetime object
     release_date = datetime.strptime(release_date_string, '%d %B %Y')
 
+    poster_div = soup.find('div', attrs={'class':'poster'})
+    poster_url = poster_div.find('img').src
+
     genres = subtext.select('a[href*=genres]')
     genre_text = []
     for genre in genres:
@@ -47,6 +50,7 @@ def parse_movie(url):
         #    'rating':rating,
             'genres':genre_text,
             'release_date':release_date,
+            'poster_url':poster_url
         #   'length':length
         }
     return data
@@ -72,8 +76,8 @@ for link in links:
         'genres':info.get('genres'),
         # 'length':info.get('length'),
         # 'rating':info.get('rating'),
-        'release_date':info.get('release_date')
-
+        'release_date':info.get('release_date'),
+        'poster_url':info.get('poster_url')
     }
     upcoming_movies.append(movie)
 
