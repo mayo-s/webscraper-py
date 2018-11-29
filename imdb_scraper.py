@@ -48,6 +48,7 @@ def parse_movie(url):
     actor_list_wrapper = soup.find('div', attrs={'id':'quicklinksMainSection'})
     actor_list_link = actor_list_wrapper.find('a')
     actor_list_url = actor_list_link['href']
+    actor_list_url = 'https://www.imdb.com' + actor_list_url
 
     genres = subtext.select('a[href*=genres]')
     genre_text = []
@@ -64,6 +65,17 @@ def parse_movie(url):
         }
     return data
 
+def parse_cast(url):
+    soup = soup_maker(url)
+    cast_table = soup.find('table', attrs={'class':'cast_list'})
+    actors = cast_table.select('a[href*=name]')
+
+    cast_names = []
+    for actor in actors:
+        name = actor.text
+        cast_names.append(name)
+    return cast_names
+
 # from each link extract text of link, id and link itself
 print ('Movie scraping in progress... ')
 upcoming_movies = []
@@ -78,6 +90,7 @@ for link in links:
     if not url.startswith('http'):
         url = 'https://www.imdb.com' + url
     info = parse_movie(url)
+    cast_url = info.get('actor_list_url')
     movie = {
         'imdb_id':imdb_id,
         'title':title,
@@ -87,7 +100,8 @@ for link in links:
         # 'rating':info.get('rating'),
         'release_date':info.get('release_date'),
         'poster_url':info.get('poster_url'),
-        'actor_list_url':info.get('actor_list_url')
+        'actor_list_url':info.get('actor_list_url'),
+        'actor_list':parse_cast(cast_url)
     }
     upcoming_movies.append(movie)
 
