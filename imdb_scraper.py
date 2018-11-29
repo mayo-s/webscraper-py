@@ -68,11 +68,12 @@ def parse_movie(url):
 def parse_cast(url):
     soup = soup_maker(url)
     cast_table = soup.find('table', attrs={'class':'cast_list'})
-    actors = cast_table.select('a[href*=name]')
+    table_rows = cast_table.find_all('tr')
 
     cast_names = []
-    for actor in actors:
-        name = actor.text
+    for row in table_rows[2:]:
+        name = row.find('td').find_next('td').text
+        name = name.replace('\n ','')
         cast_names.append(name)
     return cast_names
 
