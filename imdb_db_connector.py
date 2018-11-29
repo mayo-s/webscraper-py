@@ -23,9 +23,9 @@ def db_close():
     print ('Connection closed')
 
 # INSERT new movie dataset
-def insert_movie(title, imdb_id, url, release_date):
-    sql = "INSERT INTO movies (title,imdb_id, url, release_date) VALUES (%s, %s, %s, %s)"
-    val = (title, imdb_id, url, release_date)
+def insert_movie(title, imdb_id, url, image_url, release_date):
+    sql = "INSERT INTO movies (title, imdb_id, url, image_url, release_date) VALUES (%s, %s, %s, %s, %s)"
+    val = (title, imdb_id, url, image_url, release_date)
     try:
         dbc = db.cursor()
         dbc.execute(sql, val)
@@ -41,22 +41,31 @@ def json_read(filename):
 
 # INSERT all movies from JSON file
 def insert_all_movies():
+    print ('INSERT in progress... ')
     upcoming_movies = json_read('imdb_data.json')
     for movie in upcoming_movies:
         title = movie.get('title')
         imdb_id = movie.get('imdb_id')
         url = movie.get('url')
+        image_url = movie.get('poster_url')
         release_date = movie.get('release_date')
-        insert_movie(title, imdb_id, url, release_date)
-    print ("INSERT successful")
+        insert_movie(title, imdb_id, url, image_url, release_date)
+    print ('INSERT successful')
 
 # JSON dump
 def json_dump(data):
     print ("JSON dump in progress... ")
     movies = []
     for movie in data:
-        release_date = movie[4].strftime("%d %B %Y")
-        movies.append({'id':movie[0], 'title':movie[1], 'imdb_id':movie[2], 'url':movie[3], 'release_date':release_date, 'ranking':movie[5]})
+        release_date = movie[5].strftime("%d %B %Y")
+        movies.append({
+            'id':movie[0],
+            'title':movie[1],
+            'imdb_id':movie[2],
+            'url':movie[3],
+            'image_url': movie[4],
+            'release_date':release_date,
+            'ranking':movie[6]})
     with open('imdb_db_data.json', 'w') as outfile:
         json.dump(movies, outfile, indent=4)
     print ("JSON dump successful")
