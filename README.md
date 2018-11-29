@@ -15,5 +15,11 @@ Sample Setup (using terminal - follow on your own risk ;-) )
 - activate virtual environment > source "/projectFolder/bin/activate"
 - (urllib and json libraries should already be included in your python3 installation)
 - install BeautifulSoup library > sudo pip install beautifulsoup4
-- run script > python3 imdb_scraper.py
+- install Flask > sudo pip install flask
+
+- run scraper script > python3 imdb_scraper.py
+  - will dump scraped data into json-file (imdb_data.json)
+- run flask > python3 imdb_db_connector.py
+  - check http://127.0.0.1:5000/getAllMovies (will return json-reponse)
+
 - when done working - deactivate virtual environment > deactivate
