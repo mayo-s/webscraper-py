@@ -2,6 +2,8 @@ import mysql.connector
 from mysql.connector import Error
 import datetime
 import json
+from flask import Flask
+from flask import jsonify
 
 # Connect to local database
 def db_connect():
@@ -71,7 +73,7 @@ def json_dump(data):
     print ("JSON dump successful")
 
 # SELECT all movies database
-def select_all():
+def select_all(db):
     try:
         dbc = db.cursor()
         dbc.execute("SELECT * FROM movies")
@@ -83,13 +85,34 @@ def select_all():
 
 
 # TESTING ENVIRONMENT - work flow 
+
+def parse_json(data):
+    print ("Print data ")
+    print (data)
+    movies = []
+    for movie in data:
+        release_date = movie[5].strftime("%d %B %Y")
+        movies.append({'id':movie[0], 'title':movie[1], 'imdb_id':movie[2], 'url':movie[3], 'image_url': movie[4], 'release_date':release_date, 'ranking':movie[6] })
+    return json.dumps(movies)
+
+app = Flask(__name__)
+@app.route('/getAllMovies')
+def get_all_movies():
+    db = db_connect()
+    movies = select_all(db)
+    print (movies)
+    movies = parse_json(movies)
+    return jsonify(movies)
+
+app.run(debug=True)
+
 # connect to db
-db = db_connect()
+# db = db_connect()
 # 2.1 read json file and add movies to db
 # insert_all_movies()
 # 2.2 select all from movies table and dump  into json file
-movies = select_all()
-json_dump(movies)
+# movies = select_all()
+# json_dump(movies)
 # 3. close db connection
-db_close()
+# db_close()
 
