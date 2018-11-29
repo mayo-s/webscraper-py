@@ -1,15 +1,22 @@
 import mysql.connector
+from mysql.connector import Error
 import datetime
 import json
 
 # Connect to local database
-db = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    passwd="",
-    database="imdb"
-    )
-print('Connected to IMDb database')
+def db_connect():
+    try:
+        db = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            passwd="",
+            database="imdb"
+        )
+        if db.is_connected():
+            print('Connected to IMDb database')
+            return db;
+    except Error as e:
+        print (e)
 
 def db_close():
     db.close()
@@ -32,7 +39,7 @@ def json_read(filename):
         data = json.load(movies)
     return data
 
-# INSERT all movies from scraped JSON file
+# INSERT all movies from JSON file
 def insert_all_movies():
     upcoming_movies = json_read('imdb_data.json')
     for movie in upcoming_movies:
@@ -61,12 +68,19 @@ def select_all():
         dbc.execute("SELECT * FROM movies")
         print ("SELECT * FROM movies successful")
         movies = dbc.fetchall()
-        json_dump(movies)
+        return movies
     except Error as e:
         print(e)
 
-# insert_all_movies()
-select_all()
 
+# TESTING ENVIRONMENT - work flow 
+# connect to db
+db = db_connect()
+# 2.1 read json file and add movies to db
+# insert_all_movies()
+# 2.2 select all from movies table and dump  into json file
+movies = select_all()
+json_dump(movies)
+# 3. close db connection
 db_close()
 
