@@ -78,6 +78,17 @@ def parse_cast(url):
         cast_names.append(name)
     return cast_names
 
+# extract rating value of given movie
+def parse_rating(url):
+    soup = soup_maker(url)
+    rating_wrapper = soup.find('div', attrs={'class':'ratingValue'})
+    if rating_wrapper is not None:
+        rating_value = rating_wrapper.find('span', attrs={'itemprop':'ratingValue'}).text
+        rating_value = float(rating_value)
+    else:
+        rating_value = None
+    return rating_value
+
 # from each link extract text of link, id and link itself
 print ('Movie scraping in progress... ')
 upcoming_movies = []
@@ -99,7 +110,7 @@ for link in links:
         'url':url,
         'genres':info.get('genres'),
         # 'length':info.get('length'),
-        # 'rating':info.get('rating'),
+        'rating':parse_rating(url),
         'release_date':info.get('release_date'),
         'poster_url':info.get('poster_url'),
         'actor_list_url':info.get('actor_list_url'),
