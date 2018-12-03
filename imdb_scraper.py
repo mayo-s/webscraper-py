@@ -24,7 +24,7 @@ links = calendar.find_all('a')
 # extract specific movie information
 def parse_movie(url):
     soup = soup_maker(url)
-    title_wrapper= soup.find('div', attrs={'class':'title_wrapper'})
+    title_wrapper = soup.find('div', attrs={'class':'title_wrapper'})
     # rating = title_wrapper.find('span', attrs={'itemprop':'ratingValue'}).text
     subtext = title_wrapper.find('div', attrs={'class':'subtext'})
     # not all movies have a specified length
@@ -44,6 +44,12 @@ def parse_movie(url):
     else:
         poster_url = ''
 
+    # extract Cast link
+    actor_list_wrapper = soup.find('div', attrs={'id':'quicklinksMainSection'})
+    actor_list_link = actor_list_wrapper.find('a')
+    actor_list_url = actor_list_link['href']
+    actor_list_url = 'https://www.imdb.com' + actor_list_url
+
     genres = subtext.select('a[href*=genres]')
     genre_text = []
     for genre in genres:
@@ -53,10 +59,24 @@ def parse_movie(url):
         #    'rating':rating,
             'genres':genre_text,
             'release_date':release_date,
-            'poster_url':poster_url
+            'poster_url':poster_url,
+            'actor_list_url':actor_list_url
         #   'length':length
         }
     return data
+
+# extract cast names of given movie
+def parse_cast(url):
+    soup = soup_maker(url)
+    cast_table = soup.find('table', attrs={'class':'cast_list'})
+    table_rows = cast_table.find_all('tr', attrs={'class': True})
+
+    cast_names = []
+    for row in table_rows:
+        name = row.find('td').find_next('td').text
+        name = name.replace('\n ','')
+        cast_names.append(name)
+    return cast_names
 
 # from each link extract text of link, id and link itself
 print ('Movie scraping in progress... ')
@@ -72,6 +92,7 @@ for link in links:
     if not url.startswith('http'):
         url = 'https://www.imdb.com' + url
     info = parse_movie(url)
+    cast_url = info.get('actor_list_url')
     movie = {
         'imdb_id':imdb_id,
         'title':title,
@@ -80,7 +101,9 @@ for link in links:
         # 'length':info.get('length'),
         # 'rating':info.get('rating'),
         'release_date':info.get('release_date'),
-        'poster_url':info.get('poster_url')
+        'poster_url':info.get('poster_url'),
+        'actor_list_url':info.get('actor_list_url'),
+        'actor_list':parse_cast(cast_url)
     }
     upcoming_movies.append(movie)
 
