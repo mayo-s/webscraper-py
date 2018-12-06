@@ -4,6 +4,7 @@ import datetime
 import json
 from flask import Flask
 from flask import jsonify
+from flask_cors import CORS
 
 # Connect to local database
 def db_connect():
@@ -81,23 +82,25 @@ def select_all(db):
         print(e)
 
 
-# TESTING ENVIRONMENT - work flow 
+# TESTING ENVIRONMENT - work flow
 
 def parse_json(data):
     movies = []
     for movie in data:
         release_date = movie[5].strftime("%d %B %Y")
         movies.append({
-            'id':movie[0], 
-            'title':movie[1], 
-            'imdb_id':movie[2], 
-            'url':movie[3], 
-            'image_url': movie[4], 
-            'release_date':release_date, 
+            'id':movie[0],
+            'title':movie[1],
+            'imdb_id':movie[2],
+            'url':movie[3],
+            'image_url': movie[4],
+            'release_date':release_date,
             'ranking':movie[6] })
     return json.dumps(movies)
 
 app = Flask(__name__)
+CORS(app)
+
 @app.route('/getAllMovies')
 def get_all_movies():
     db = db_connect()
