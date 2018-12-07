@@ -1,30 +1,24 @@
-from flask import Flask
+from flask import Flask, request
+from flask_cors import CORS
 import json
 import mysql.connector
 from mysql.connector import Error
+from imdb_db_connector import get_all_movies
+from imdb_db_connector import filter_movies
 
 app = Flask(__name__)
-
-# JSON dump
-def json_dump(data):
-    print ("JSON dump in progress... ")
-    movies = []
-    for movie in data:
-        release_date = movie[4].strftime("%d %B %Y")
-        movies.append({'id':movie[0], 'title':movie[1], 'imdb_id':movie[2], 'url':movie[3], 'release_date':release_date, 'ranking':movie[5]})
-    with open('imdb_db_data.json', 'w') as outfile:
-        json.dump(movies, outfile, indent=4)
-    print ("JSON dump successful")
+CORS(app)
 
 @app.route('/getAllMovies')
-def get_all_movies():
-    try:
-        dbc = db.cursor()
-        dbc.execute("SELECT * FROM movies")
-        print ("SELECT * FROM movies successful")
-        movies = dbc.fetchall()
-    except Error as e:
-        print(e)
-    return json_dump(movies)
+def all_movies():
+    return get_all_movies()
+
+@app.route('/filter')
+def filter():
+    #request date format must be '2019-01-01'
+    start = request.args.get('start')
+    end = request.args.get('end')
+
+    return filter_movies(start, end)
 
 app.run(debug=True)

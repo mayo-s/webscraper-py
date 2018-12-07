@@ -4,7 +4,6 @@ import datetime
 import json
 from flask import Flask
 from flask import jsonify
-from flask_cors import CORS
 
 # Connect to local database
 def db_connect():
@@ -70,20 +69,6 @@ def json_dump(data):
         json.dump(movies, outfile, indent=4)
     print ("JSON dump successful")
 
-# SELECT all movies database
-def select_all(db):
-    try:
-        dbc = db.cursor()
-        dbc.execute("SELECT * FROM movies")
-        print ("SELECT * FROM movies successful")
-        movies = dbc.fetchall()
-        return movies
-    except Error as e:
-        print(e)
-
-
-# TESTING ENVIRONMENT - work flow
-
 def parse_json(data):
     movies = []
     for movie in data:
@@ -98,17 +83,41 @@ def parse_json(data):
             'ranking':movie[6] })
     return json.dumps(movies)
 
-app = Flask(__name__)
-CORS(app)
 
-@app.route('/getAllMovies')
+# SELECT all movies from database
 def get_all_movies():
     db = db_connect()
-    movies = select_all(db)
+    try:
+        dbc = db.cursor()
+        dbc.execute("SELECT * FROM movies")
+        print ("SELECT * FROM movies successful")
+        movies = dbc.fetchall()
+    except Error as e:
+        print(e)
+
     movies = parse_json(movies)
     return jsonify(movies)
 
-app.run(debug=True)
+def filter_movies(start, end):
+    db = db_connect()
+
+    try:
+        dbc = db.cursor()
+        query = "SELECT * FROM movies WHERE (release_date BETWEEN %s AND %s)"
+        values = (start, end)
+        dbc.execute(query, values)
+
+        movies = dbc.fetchall()
+    except Error as e:
+        print(e)
+
+    movies = parse_json(movies)
+    return jsonify(movies)
+
+
+
+
+# TESTING ENVIRONMENT - work flow
 
 # connect to db
 # db = db_connect()
