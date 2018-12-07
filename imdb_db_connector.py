@@ -98,7 +98,7 @@ def get_all_movies():
     movies = parse_json(movies)
     return jsonify(movies)
 
-def filter_movies(start, end):
+def filter_movies(start, end, actor, genre, rating):
     db = db_connect()
 
     try:
