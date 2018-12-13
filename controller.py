@@ -10,7 +10,7 @@ CORS(app)
 def all_movies():
     return get_all_movies()
 
-@app.route('/filter')
+@app.route('/getSearch')
 def filter():
     #request date format must be '2019-01-01'
     start = request.args.get('start')
