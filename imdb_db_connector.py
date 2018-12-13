@@ -135,8 +135,10 @@ def insert_all_movies():
                 genre_id = get_genre_id(genre)
                 print(genre_id)
                 if genre_id == []:
+                    print('Found new genre!')
                     print('INSERTING genre..')
                     genre_id = insert_genre(genre)
+                    print('New genre ' + genre + ' has been inserted successfully')
 
                 insert_movie_genre(movie_id, genre_id)
 
@@ -179,6 +181,14 @@ def parse_json(data):
             'ranking':movie[6] })
     return json.dumps(movies)
 
+def parse_genres(data):
+    genres = []
+    for genre in data:
+        genres.append({
+            'id':genre[0],
+            'genre':genre[1]
+        })
+    return json.dumps(genres)
 
 # SELECT all movies from database
 def get_all_movies():
@@ -193,6 +203,21 @@ def get_all_movies():
 
     movies = parse_json(movies)
     return jsonify(movies)
+
+# SELECT all genres from database
+def get_all_genres():
+    db = db_connect()
+    try:
+        dbc = db.cursor()
+        dbc.execute("SELECT * FROM genres")
+        print ("SELECT * FROM genres successful")
+        genres = dbc.fetchall()
+    except Error as e:
+        print(e)
+
+    genres = parse_genres(genres)
+    print(genres)
+    return jsonify(genres)
 
 def filter_movies(start, end, actor, genre, rating):
     db = db_connect()
@@ -217,7 +242,7 @@ def filter_movies(start, end, actor, genre, rating):
 # connect to db
 # db = db_connect()
 # 2.1 read json file and add movies to db
-insert_all_movies()
+# insert_all_movies()
 # 2.2 select all from movies table and dump  into json file
 # movies = select_all()
 # json_dump(movies)
