@@ -69,19 +69,24 @@ def parse_movie(url):
 def parse_cast(url):
     soup = soup_maker(url)
     cast_table = soup.find('table', attrs={'class':'cast_list'})
-    table_rows = cast_table.find_all('tr', attrs={'class': True})
 
-    cast_names = {}
-    for row in table_rows:
-        name = row.find('td').find_next('td').text
-        name = name.replace('\n ','')
-        # extract actor id
-        actor_link = row.find('a')
-        actor_link_url = actor_link['href']
-        actor_id = actor_link_url.split('/')[2]
-        actor_id = actor_id.replace('nm', '')
-        cast_names[name] = actor_id
-    return cast_names
+    actors = []
+    if cast_table is not None:
+        table_rows = cast_table.find_all('tr', attrs={'class': True})
+        for row in table_rows:
+            name = row.find('td').find_next('td').text
+            name = name.replace('\n ','')
+            # extract actor id
+            actor_link = row.find('a')
+            actor_link_url = actor_link['href']
+            actor_id = actor_link_url.split('/')[2]
+            actor_id = actor_id.replace('nm', '')
+            actor = {
+                'name': name,
+                'id': actor_id
+            }
+            actors.append(actor)
+    return actors
 
 # extract rating value of given movie
 def parse_rating(url):

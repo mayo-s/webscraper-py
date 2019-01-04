@@ -22,9 +22,9 @@ def db_close(db):
     print ('Connection closed')
 
 # INSERT new movie dataset
-def insert_movie(title, imdb_id, url, image_url, release_date):
-    sql = "INSERT INTO movies (title, imdb_id, url, image_url, release_date) VALUES (%s, %s, %s, %s, %s)"
-    val = (title, imdb_id, url, image_url, release_date)
+def insert_movie(title, imdb_id, url, image_url, release_date, rating):
+    sql = "INSERT INTO movies (title, imdb_id, url, image_url, release_date, rating) VALUES (%s, %s, %s, %s, %s, %s)"
+    val = (title, imdb_id, url, image_url, release_date, rating)
     try:
         db = db_connect()
         dbc = db.cursor()
@@ -48,6 +48,19 @@ def insert_genre(genre):
     except Error as e:
         print(e)
 
+def insert_actor(name, imdb_id):
+    sql = "INSERT INTO actors (imdb_id, name) VALUES (%s, %s)"
+    val = (imdb_id, name)
+    try:
+        db = db_connect()
+        dbc = db.cursor()
+        dbc.execute(sql, val)
+        actor_id = dbc.lastrowid
+        db.commit()
+        return actor_id
+    except Error as e:
+        print(e)
+
 def insert_movie_genre(movie_id, genre_id):
     sql = "INSERT INTO movieGenres (id_genre, id_movie) VALUES (%s, %s)"
     val = (genre_id, movie_id)
@@ -59,7 +72,7 @@ def insert_movie_genre(movie_id, genre_id):
     except Error as e:
         print(e)
 
-def insert_movie_actor(movie_id, genre_id):
+def insert_movie_actor(movie_id, actor_id):
     sql = "INSERT INTO movieActors (id_actor, id_movie) VALUES (%s, %s)"
     val = (actor_id, movie_id)
     try:
@@ -101,6 +114,19 @@ def get_genre_id(genre):
     except Error as e:
         print(e)
 
+def get_actor_id(actor_id):
+    try:
+        db = db_connect()
+        dbc = db.cursor()
+        dbc.execute('SELECT id FROM actors WHERE imdb_id = \'' + actor_id + '\'')
+        actor_id = dbc.fetchall()
+        if actor_id != []:
+            actor_id = actor_id[0][0]
+        db_close(db)
+        return actor_id;
+    except Error as e:
+        print(e)
+
 def get_movie_id(imdb_id):
     try:
         db = db_connect()
@@ -117,7 +143,6 @@ def get_movie_id(imdb_id):
 
 # INSERT all movies from JSON file
 def insert_all_movies():
-    print ('INSERT in progress... ')
     upcoming_movies = json_read('imdb_data.json')
     db_movie_ids = get_all_movie_ids();
 
@@ -129,25 +154,24 @@ def insert_all_movies():
             url = movie.get('url')
             image_url = movie.get('poster_url')
             release_date = movie.get('release_date')
-            movie_id = insert_movie(title, imdb_id, url, image_url, release_date)
+            rating = movie.get('rating')
+            movie_id = insert_movie(title, imdb_id, url, image_url, release_date, rating)
 
             for genre in movie.get('genres'):
                 genre_id = get_genre_id(genre)
-                print(genre_id)
                 if genre_id == []:
-                    print('Found new genre!')
-                    print('INSERTING genre..')
                     genre_id = insert_genre(genre)
-                    print('New genre ' + genre + ' has been inserted successfully')
 
                 insert_movie_genre(movie_id, genre_id)
 
-            #for actor in movie.get('actor_list'):
-                #actor_id = get_actor_id();
+            for actor in movie.get('actor_list'):
+                actor_name = actor.get('name')
+                actor_id = actor.get('id');
+                actor_db_id = get_actor_id(actor_id)
+                if actor_db_id == []:
+                    actor_id = insert_actor(actor_name, actor_id)
 
-
-            print ('INSERT successful')
-
+                insert_movie_actor(movie_id, actor_id)
 
 # JSON dump
 def json_dump(data):
@@ -219,7 +243,7 @@ def get_all_genres():
     print(genres)
     return jsonify(genres)
 
-def filter_movies(start, end, actor, genre, rating):
+def filter_movies(actor, genre, rating):
     db = db_connect()
     try:
         dbc = db.cursor()
@@ -239,10 +263,8 @@ def filter_movies(start, end, actor, genre, rating):
 
 # TESTING ENVIRONMENT - work flow
 
-# connect to db
-# db = db_connect()
 # 2.1 read json file and add movies to db
-# insert_all_movies()
+insert_all_movies()
 # 2.2 select all from movies table and dump  into json file
 # movies = select_all()
 # json_dump(movies)
