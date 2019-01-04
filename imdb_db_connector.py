@@ -208,17 +208,13 @@ def parse_json(data):
 def parse_genres(data):
     genres = []
     for genre in data:
-        genres.append({
-            'genre':genre[0]
-        })
+        genres.append(genre[0])
     return json.dumps(genres)
 
 def parse_actors(data):
     actors = []
     for actor in data:
-        actors.append({
-            'name': actor[0]
-        })
+        actors.append(actor[0])
     return json.dumps(actors)
 
 # SELECT all movies from database
