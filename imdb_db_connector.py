@@ -202,20 +202,27 @@ def parse_json(data):
             'url':movie[3],
             'image_url': movie[4],
             'release_date':release_date,
-            'ranking':movie[6] })
+            'rating':movie[6] })
     return json.dumps(movies)
 
 def parse_genres(data):
     genres = []
     for genre in data:
         genres.append({
-            'id':genre[0],
-            'genre':genre[1]
+            'genre':genre[0]
         })
     return json.dumps(genres)
 
+def parse_actors(data):
+    actors = []
+    for actor in data:
+        actors.append({
+            'name': actor[0]
+        })
+    return json.dumps(actors)
+
 # SELECT all movies from database
-def get_all_movies():
+def get_all_movies(actor, genre, rating):
     db = db_connect()
     try:
         dbc = db.cursor()
@@ -233,8 +240,7 @@ def get_all_genres():
     db = db_connect()
     try:
         dbc = db.cursor()
-        dbc.execute("SELECT * FROM genres")
-        print ("SELECT * FROM genres successful")
+        dbc.execute("SELECT genre FROM genres")
         genres = dbc.fetchall()
     except Error as e:
         print(e)
@@ -242,6 +248,19 @@ def get_all_genres():
     genres = parse_genres(genres)
     print(genres)
     return jsonify(genres)
+
+# SELECT all movies from database
+def get_all_actors():
+    db = db_connect()
+    try:
+        dbc = db.cursor()
+        dbc.execute("SELECT name FROM actors")
+        actors = dbc.fetchall()
+    except Error as e:
+        print(e)
+
+    actors = parse_actors(actors)
+    return jsonify(actors)
 
 def filter_movies(actor, genre, rating):
     db = db_connect()
@@ -264,7 +283,7 @@ def filter_movies(actor, genre, rating):
 # TESTING ENVIRONMENT - work flow
 
 # 2.1 read json file and add movies to db
-insert_all_movies()
+# insert_all_movies()
 # 2.2 select all from movies table and dump  into json file
 # movies = select_all()
 # json_dump(movies)
