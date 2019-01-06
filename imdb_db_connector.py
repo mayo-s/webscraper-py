@@ -35,6 +35,7 @@ def insert_movie(title, imdb_id, url, image_url, release_date, rating):
     except Error as e:
         print(e)
 
+# INSERT new genre
 def insert_genre(genre):
     sql = "INSERT INTO genres (genre) VALUES (%s)"
     val = (genre,)
@@ -48,6 +49,7 @@ def insert_genre(genre):
     except Error as e:
         print(e)
 
+# INSERT new actor dataset
 def insert_actor(name, imdb_id):
     sql = "INSERT INTO actors (imdb_id, name) VALUES (%s, %s)"
     val = (imdb_id, name)
@@ -61,6 +63,7 @@ def insert_actor(name, imdb_id):
     except Error as e:
         print(e)
 
+# INSERT new movie genre
 def insert_movie_genre(movie_id, genre_id):
     sql = "INSERT INTO movieGenres (id_genre, id_movie) VALUES (%s, %s)"
     val = (genre_id, movie_id)
@@ -72,6 +75,7 @@ def insert_movie_genre(movie_id, genre_id):
     except Error as e:
         print(e)
 
+# INSERT new movie actor
 def insert_movie_actor(movie_id, actor_id):
     sql = "INSERT INTO movieActors (id_actor, id_movie) VALUES (%s, %s)"
     val = (actor_id, movie_id)
@@ -89,6 +93,7 @@ def json_read(filename):
         data = json.load(json_data)
     return data
 
+# SELECT all movie ids
 def get_all_movie_ids():
     ids = []
     try:
@@ -101,6 +106,22 @@ def get_all_movie_ids():
     except Error as e:
         print(e)
 
+# SELECT movie id by imdb_id
+def get_movie_id(imdb_id):
+    try:
+        db = db_connect()
+        dbc = db.cursor()
+        dbc.execute('SELECT id FROM movies WHERE imdb_id = \'' + imdb_id + '\'')
+        movie_id = dbc.fetchall()
+        if movie_id != []:
+            movie_id = movie_id[0][0]
+            print(movie_id)
+        db_close(db)
+        return movie_id;
+    except Error as e:
+        print(e)
+
+# SELECT genre id by genre name
 def get_genre_id(genre):
     try:
         db = db_connect()
@@ -114,30 +135,17 @@ def get_genre_id(genre):
     except Error as e:
         print(e)
 
-def get_actor_id(actor_id):
+# SELECT actor id by imdb_id
+def get_actor_id(imdb_id):
     try:
         db = db_connect()
         dbc = db.cursor()
-        dbc.execute('SELECT id FROM actors WHERE imdb_id = \'' + actor_id + '\'')
+        dbc.execute('SELECT id FROM actors WHERE imdb_id = \'' + imdb_id + '\'')
         actor_id = dbc.fetchall()
         if actor_id != []:
             actor_id = actor_id[0][0]
         db_close(db)
         return actor_id;
-    except Error as e:
-        print(e)
-
-def get_movie_id(imdb_id):
-    try:
-        db = db_connect()
-        dbc = db.cursor()
-        dbc.execute('SELECT id FROM movies WHERE imdb_id = \'' + imdb_id + '\'')
-        movie_id = dbc.fetchall()
-        if movie_id != []:
-            movie_id = movie_id[0][0]
-            print(movie_id)
-        db_close(db)
-        return movie_id;
     except Error as e:
         print(e)
 
@@ -191,7 +199,7 @@ def json_dump(data):
         json.dump(movies, outfile, indent=4)
     print ("JSON dump successful")
 
-def parse_json(data):
+def parse_movies(data):
     movies = []
     for movie in data:
         release_date = movie[5].strftime("%d %B %Y")
@@ -223,12 +231,11 @@ def get_all_movies(actor, genre, rating):
     try:
         dbc = db.cursor()
         dbc.execute("SELECT * FROM movies")
-        print ("SELECT * FROM movies successful")
         movies = dbc.fetchall()
     except Error as e:
         print(e)
 
-    movies = parse_json(movies)
+    movies = parse_movies(movies)
     return jsonify(movies)
 
 # SELECT all genres from database
@@ -257,24 +264,6 @@ def get_all_actors():
 
     actors = parse_actors(actors)
     return jsonify(actors)
-
-def filter_movies(actor, genre, rating):
-    db = db_connect()
-    try:
-        dbc = db.cursor()
-        query = "SELECT * FROM movies WHERE (release_date BETWEEN %s AND %s)"
-        values = (start, end)
-        dbc.execute(query, values)
-
-        movies = dbc.fetchall()
-    except Error as e:
-        print(e)
-
-    movies = parse_json(movies)
-    return jsonify(movies)
-
-
-
 
 # TESTING ENVIRONMENT - work flow
 

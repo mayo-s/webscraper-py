@@ -8,7 +8,7 @@ from imdb_db_connector import filter_movies
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/getAllMovies')
+@app.route('/getMovies')
 def all_movies():
     actor = request.args.get('actor')
     genre = request.args.get('genre')
@@ -25,21 +25,5 @@ def all_genres():
 @app.route('/getAllActors')
 def all_actors():
     return get_all_actors()
-
-@app.route('/getSearch')
-def filter():
-    actor = request.args.get('actor')
-    if actor == None:
-        nothing
-
-    genre = request.args.get('genre')
-    if genre == None:
-        nothing
-
-    rating = request.args.get('rating')
-    if rating == None:
-        nothing
-
-    return filter_movies(actor, genre, rating)
 
 app.run(debug=True)
