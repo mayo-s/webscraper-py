@@ -201,7 +201,16 @@ def json_dump(data):
 
 def parse_movies(data):
     movies = []
+    db = db_connect()
+
     for movie in data:
+        try:
+            dbc = db.cursor()
+            dbc.execute("SELECT genres.genre FROM movieGenres INNER JOIN genres ON movieGenres.id_genre = genres.id WHERE movieGenres.id_movie = %s", (movie[0],))
+            genres = dbc.fetchall()
+        except Error as e:
+            print(e)
+
         release_date = movie[5].strftime("%d %B %Y")
         movies.append({
             'id':movie[0],
@@ -210,7 +219,8 @@ def parse_movies(data):
             'url':movie[3],
             'image_url': movie[4],
             'release_date':release_date,
-            'rating':movie[6] })
+            'rating':movie[6],
+            'genres':genres})
     return json.dumps(movies)
 
 def parse_genres(data):
