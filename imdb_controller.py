@@ -13,6 +13,8 @@ def all_movies():
     actor = request.args.get('actor')
     genre = request.args.get('genre')
     rating = request.args.get('rating')
+    if rating == None:
+        rating = 0
 
     return get_all_movies(actor, genre, rating)
 
