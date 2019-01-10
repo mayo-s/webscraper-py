@@ -252,10 +252,10 @@ def get_movies(actor, genre, rating):
     actor = "%" + actor + "%"
     genre = "%" + genre + "%"
 
-    query = "SELECT DISTINCT j.* FROM (SELECT f.* FROM (SELECT m.* FROM movies m JOIN movieActors ma ON ma.id_movie = m.id JOIN actors a ON a.id = ma.id_actor AND a.name LIKE %s) as f JOIN movieGenres mg ON mg.id_movie = f.id JOIN genres g ON g.id = mg.id_genre AND g.genre LIKE %s) as j WHERE rating >= %s ORDER BY rating ASC"
+    query = "SELECT DISTINCT j.* FROM (SELECT f.* FROM (SELECT m.* FROM movies m JOIN movieActors ma ON ma.id_movie = m.id JOIN actors a ON a.id = ma.id_actor AND a.name LIKE %s) as f JOIN movieGenres mg ON mg.id_movie = f.id JOIN genres g ON g.id = mg.id_genre AND g.genre LIKE %s) as j WHERE rating >= %s OR rating IS NULL ORDER BY rating ASC"
     values = (actor, genre, rating)
-
     movies = []
+
     db = db_connect()
     try:
         dbc = db.cursor()
