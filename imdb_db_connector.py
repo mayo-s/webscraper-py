@@ -2,8 +2,6 @@ import mysql.connector
 from mysql.connector import Error
 import datetime
 import json
-from flask import Flask
-from flask import jsonify
 
 # Connect to local database
 def db_connect():
@@ -21,12 +19,58 @@ def db_close(db):
     db.close()
     print ('Connection closed')
 
+# SELECT all movie ids
+def get_all_movie_ids():
+    ids = []
+    try:
+        dbc = db.cursor()
+        dbc.execute('SELECT imdb_id FROM movies')
+        ids = dbc.fetchall()
+        return ids;
+    except Error as e:
+        print(e)
+
+# SELECT movie id by imdb_id
+def get_movie_id(imdb_id):
+    try:
+        dbc = db.cursor()
+        dbc.execute('SELECT id FROM movies WHERE imdb_id = \'' + imdb_id + '\'')
+        movie_id = dbc.fetchall()
+        if movie_id != []:
+            movie_id = movie_id[0][0]
+        return movie_id;
+    except Error as e:
+        print(e)
+
+# SELECT genre id by genre name
+def get_genre_id(genre):
+    try:
+        dbc = db.cursor()
+        dbc.execute('SELECT id FROM genres WHERE genre = \'' + genre + '\'')
+        genre_id = dbc.fetchall()
+        if genre_id != []:
+            genre_id = genre_id[0][0]
+        return genre_id;
+    except Error as e:
+        print(e)
+
+# SELECT actor id by imdb_id
+def get_actor_id(imdb_id):
+    try:
+        dbc = db.cursor()
+        dbc.execute('SELECT id FROM actors WHERE imdb_id = \'' + imdb_id + '\'')
+        actor_id = dbc.fetchall()
+        if actor_id != []:
+            actor_id = actor_id[0][0]
+        return actor_id;
+    except Error as e:
+        print(e)
+
 # INSERT new movie dataset
 def insert_movie(title, imdb_id, url, image_url, release_date, rating):
     sql = "INSERT INTO movies (title, imdb_id, url, image_url, release_date, rating) VALUES (%s, %s, %s, %s, %s, %s)"
     val = (title, imdb_id, url, image_url, release_date, rating)
     try:
-        db = db_connect()
         dbc = db.cursor()
         dbc.execute(sql, val)
         movie_id = dbc.lastrowid
@@ -40,7 +84,6 @@ def insert_genre(genre):
     sql = "INSERT INTO genres (genre) VALUES (%s)"
     val = (genre,)
     try:
-        db = db_connect()
         dbc = db.cursor()
         dbc.execute(sql, val)
         genre_id = dbc.lastrowid
@@ -54,7 +97,6 @@ def insert_actor(name, imdb_id):
     sql = "INSERT INTO actors (imdb_id, name) VALUES (%s, %s)"
     val = (imdb_id, name)
     try:
-        db = db_connect()
         dbc = db.cursor()
         dbc.execute(sql, val)
         actor_id = dbc.lastrowid
@@ -68,7 +110,6 @@ def insert_movie_genre(movie_id, genre_id):
     sql = "INSERT INTO movieGenres (id_genre, id_movie) VALUES (%s, %s)"
     val = (genre_id, movie_id)
     try:
-        db = db_connect()
         dbc = db.cursor()
         dbc.execute(sql, val)
         db.commit()
@@ -80,7 +121,6 @@ def insert_movie_actor(movie_id, actor_id):
     sql = "INSERT INTO movieActors (id_actor, id_movie) VALUES (%s, %s)"
     val = (actor_id, movie_id)
     try:
-        db = db_connect()
         dbc = db.cursor()
         dbc.execute(sql, val)
         db.commit()
@@ -93,64 +133,10 @@ def json_read(filename):
         data = json.load(json_data)
     return data
 
-# SELECT all movie ids
-def get_all_movie_ids():
-    ids = []
-    try:
-        db = db_connect()
-        dbc = db.cursor()
-        dbc.execute('SELECT imdb_id FROM movies')
-        ids = dbc.fetchall()
-        db_close(db)
-        return ids;
-    except Error as e:
-        print(e)
-
-# SELECT movie id by imdb_id
-def get_movie_id(imdb_id):
-    try:
-        db = db_connect()
-        dbc = db.cursor()
-        dbc.execute('SELECT id FROM movies WHERE imdb_id = \'' + imdb_id + '\'')
-        movie_id = dbc.fetchall()
-        if movie_id != []:
-            movie_id = movie_id[0][0]
-            print(movie_id)
-        db_close(db)
-        return movie_id;
-    except Error as e:
-        print(e)
-
-# SELECT genre id by genre name
-def get_genre_id(genre):
-    try:
-        db = db_connect()
-        dbc = db.cursor()
-        dbc.execute('SELECT id FROM genres WHERE genre = \'' + genre + '\'')
-        genre_id = dbc.fetchall()
-        if genre_id != []:
-            genre_id = genre_id[0][0]
-        db_close(db)
-        return genre_id;
-    except Error as e:
-        print(e)
-
-# SELECT actor id by imdb_id
-def get_actor_id(imdb_id):
-    try:
-        db = db_connect()
-        dbc = db.cursor()
-        dbc.execute('SELECT id FROM actors WHERE imdb_id = \'' + imdb_id + '\'')
-        actor_id = dbc.fetchall()
-        if actor_id != []:
-            actor_id = actor_id[0][0]
-        db_close(db)
-        return actor_id;
-    except Error as e:
-        print(e)
 
 # INSERT all movies from JSON file
 def insert_all_movies():
+    print("Adding new movies...")
     upcoming_movies = json_read('imdb_data.json')
     db_movie_ids = get_all_movie_ids();
 
@@ -199,106 +185,10 @@ def json_dump(data):
         json.dump(movies, outfile, indent=4)
     print ("JSON dump successful")
 
-def parse_movies(data):
-    movies = []
-    db = db_connect()
-
-    for movie in data:
-        try:
-            dbc = db.cursor()
-            dbc.execute("SELECT genres.genre FROM movieGenres INNER JOIN genres ON movieGenres.id_genre = genres.id WHERE movieGenres.id_movie = %s", (movie[0],))
-            genres = dbc.fetchall()
-        except Error as e:
-            print(e)
-
-        release_date = movie[5].strftime("%d %B %Y")
-        movies.append({
-            'id':movie[0],
-            'title':movie[1],
-            'imdb_id':movie[2],
-            'url':movie[3],
-            'image_url': movie[4],
-            'release_date':release_date,
-            'rating':movie[6],
-            'genres':genres})
-    return json.dumps(movies)
-
-def parse_genres(data):
-    genres = []
-    for genre in data:
-        genres.append(genre[0])
-    return json.dumps(genres)
-
-def parse_actors(data):
-    actors = []
-    for actor in data:
-        actors.append(actor[0])
-    return json.dumps(actors)
-
-# SELECT all movies from database
-def get_all_movies():
-    db = db_connect()
-    try:
-        dbc = db.cursor()
-        dbc.execute("SELECT * FROM movies")
-        movies = dbc.fetchall()
-    except Error as e:
-        print(e)
-
-    movies = parse_movies(movies)
-    return jsonify(movies)
-
-def get_movies(actor, genre, rating):
-    actor = "%" + actor + "%"
-    genre = "%" + genre + "%"
-
-    query = "SELECT DISTINCT j.* FROM (SELECT f.* FROM (SELECT m.* FROM movies m JOIN movieActors ma ON ma.id_movie = m.id JOIN actors a ON a.id = ma.id_actor AND a.name LIKE %s) as f JOIN movieGenres mg ON mg.id_movie = f.id JOIN genres g ON g.id = mg.id_genre AND g.genre LIKE %s) as j WHERE rating >= %s ORDER BY rating ASC"
-    values = (actor, genre, rating)
-
-    movies = []
-    db = db_connect()
-    try:
-        dbc = db.cursor()
-        dbc.execute(query, values)
-        movies = dbc.fetchall()
-    except Error as e:
-            print(e)
-
-    movies = parse_movies(movies)
-    return jsonify(movies)
-
-# SELECT all genres from database
-def get_all_genres():
-    try:
-        db = db_connect()
-        dbc = db.cursor()
-        dbc.execute("SELECT genre FROM genres")
-        genres = dbc.fetchall()
-    except Error as e:
-        print(e)
-
-    genres = parse_genres(genres)
-    return jsonify(genres)
-
-# SELECT all movies from database
-def get_all_actors():
-    try:
-        db = db_connect()
-        dbc = db.cursor()
-        dbc.execute("SELECT name FROM actors")
-        actors = dbc.fetchall()
-    except Error as e:
-        print(e)
-
-    actors = parse_actors(actors)
-    return jsonify(actors)
-
 # TESTING ENVIRONMENT - work flow
-
-# 2.1 read json file and add movies to db
-# insert_all_movies()
-# 2.2 select all from movies table and dump  into json file
-# movies = select_all()
-# json_dump(movies)
-# 3. close db connection
-# db_close()
+# BEGIN
+db = db_connect()
+# 1 read json file and add movies to db
+insert_all_movies()
+# 2 close db connection
+db_close(db)

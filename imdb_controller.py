@@ -1,8 +1,6 @@
 from flask import Flask, request
 from flask_cors import CORS
-from imdb_db_connector import get_movies
-from imdb_db_connector import get_all_genres
-from imdb_db_connector import get_all_actors
+from imdb_db_flask import get_movies, get_all_genres, get_all_actors
 
 app = Flask(__name__)
 CORS(app)
