@@ -25,18 +25,17 @@ links = calendar.find_all('a')
 def parse_movie(url):
     soup = soup_maker(url)
     title_wrapper = soup.find('div', attrs={'class':'title_wrapper'})
-    # rating = title_wrapper.find('span', attrs={'itemprop':'ratingValue'}).text
     subtext = title_wrapper.find('div', attrs={'class':'subtext'})
-    # not all movies have a specified length
-    # length = subtext.find('time').text
-    # not all movies have a rating yet
-    # rating = ...
+
+    # extract release date
     release_date_string = subtext.find('a', attrs={'title':'See more release dates'}).text
     # cut off (<country name>)
     release_date_string = release_date_string.split(' ')
     release_date_string = release_date_string[0] + ' ' + release_date_string[1] + ' ' + release_date_string[2]
     # parse date string (d Month YYYY) to datetime object
     release_date = datetime.strptime(release_date_string, '%d %B %Y')
+
+    # extract poster url if existing
     poster_div = soup.find('div', attrs={'class':'poster'})
     if poster_div is not None:
         poster = poster_div.find('img')
@@ -44,32 +43,14 @@ def parse_movie(url):
     else:
         poster_url = ''
 
-    # extract Cast link
+    # extract cast url
     actor_list_wrapper = soup.find('div', attrs={'id':'quicklinksMainSection'})
     actor_list_link = actor_list_wrapper.find('a')
     actor_list_url = actor_list_link['href']
     actor_list_url = 'https://www.imdb.com' + actor_list_url
 
-    genres = subtext.select('a[href*=genres]')
-    genre_text = []
-    for genre in genres:
-        text = genre.text
-        genre_text.append(text)
-        data = {
-        #    'rating':rating,
-            'genres':genre_text,
-            'release_date':release_date,
-            'poster_url':poster_url,
-            'actor_list_url':actor_list_url
-        #   'length':length
-        }
-    return data
-
-# extract cast names of given movie
-def parse_cast(url):
-    soup = soup_maker(url)
+    # extract cast
     cast_table = soup.find('table', attrs={'class':'cast_list'})
-
     actors = []
     if cast_table is not None:
         table_rows = cast_table.find_all('tr', attrs={'class': True})
@@ -86,18 +67,31 @@ def parse_cast(url):
                 'id': actor_id
             }
             actors.append(actor)
-    return actors
 
-# extract rating value of given movie
-def parse_rating(url):
-    soup = soup_maker(url)
+    # extract genres
+    genres = subtext.select('a[href*=genres]')
+    genre_text = []
+    for genre in genres:
+        text = genre.text
+        genre_text.append(text)
+
+    # extract rating value of given movie
     rating_wrapper = soup.find('div', attrs={'class':'ratingValue'})
     if rating_wrapper is not None:
         rating_value = rating_wrapper.find('span', attrs={'itemprop':'ratingValue'}).text
         rating_value = float(rating_value)
     else:
         rating_value = None
-    return rating_value
+        
+    data = {
+        'genres':genre_text,
+        'release_date':release_date,
+        'poster_url':poster_url,
+        'actor_list_url':actor_list_url,
+        'actors':actors,
+        'rating':rating_value
+    }
+    return data
 
 # from each link extract text of link, id and link itself
 print ('Movie scraping in progress... ')
@@ -106,25 +100,27 @@ for link in links:
     title = link.text
     url = link['href']
 
-    #extract unique movie id from url (/title/tt<id>/?ref_=rlm)
+    # extract unique movie id from url (/title/tt<id>/?ref_=rlm)
     imdb_id = url.split('/')[2]
     imdb_id = imdb_id.replace('tt', '')
 
+    # build url
     if not url.startswith('http'):
         url = 'https://www.imdb.com' + url
+
+    # parse each movie
     info = parse_movie(url)
-    cast_url = info.get('actor_list_url')
+
     movie = {
         'imdb_id':imdb_id,
         'title':title,
         'url':url,
         'genres':info.get('genres'),
-        # 'length':info.get('length'),
-        'rating':parse_rating(url),
+        'rating':info.get('rating'),
         'release_date':info.get('release_date'),
         'poster_url':info.get('poster_url'),
         'actor_list_url':info.get('actor_list_url'),
-        'actor_list':parse_cast(cast_url)
+        'actor_list':info.get('actors')
     }
     upcoming_movies.append(movie)
 
