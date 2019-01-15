@@ -1,4 +1,6 @@
 from imdb_db_connector import db_connect, db_close
+import json
+from flask import jsonify
 
 def parse_movies(data):
     movies = []
