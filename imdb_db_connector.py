@@ -160,7 +160,7 @@ def insert_all_movies():
 
             for actor in movie.get('actor_list'):
                 actor_name = actor.get('name')
-                actor_id = actor.get('id');
+                actor_id = actor.get('id')
                 actor_db_id = get_actor_id(actor_id)
                 if actor_db_id == []:
                     actor_id = insert_actor(actor_name, actor_id)
@@ -187,8 +187,8 @@ def json_dump(data):
 
 # TESTING ENVIRONMENT - work flow
 # BEGIN
-db = db_connect()
+# db = db_connect()
 # 1 read json file and add movies to db
-insert_all_movies()
+# insert_all_movies()
 # 2 close db connection
-db_close(db)
+# db_close(db)
