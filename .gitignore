@@ -3,7 +3,13 @@
 /bin/
 *.swp
 *.json
-.db_pref.cnf
+*.cnf
+*.xml
+
+# image files
+*.jpg
+*.jpeg
+*.png
 
 # pip
 pip-selfcheck.json
