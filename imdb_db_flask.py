@@ -1,10 +1,29 @@
-from imdb_db_connector import db_connect, db_close
+# from imdb_db_connector import db_connect, db_close
 import json
 from flask import jsonify
+import mysql.connector
+from mysql.connector import Error
+
+# Connect to local database
+def db_connect():
+    try:
+        db = mysql.connector.connect(
+            option_files = '.db_pref.cnf'
+        )
+        if db.is_connected():
+            print('Connected to IMDb database')
+            return db;
+    except Error as e:
+        print (e)
+
+def db_close(db):
+    db.close()
+    print ('Connection closed')
+
+db = db_connect()
 
 def parse_movies(data):
     movies = []
-    db = db_connect()
 
     for movie in data:
         try:

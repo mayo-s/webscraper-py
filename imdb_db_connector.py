@@ -3,21 +3,6 @@ from mysql.connector import Error
 import datetime
 import json
 
-# Connect to local database
-def db_connect():
-    try:
-        db = mysql.connector.connect(
-            option_files = '.db_pref.cnf'
-        )
-        if db.is_connected():
-            print('Connected to IMDb database')
-            return db;
-    except Error as e:
-        print (e)
-
-def db_close(db):
-    db.close()
-    print ('Connection closed')
 
 # SELECT all movie ids
 def get_all_movie_ids():
