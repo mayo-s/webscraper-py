@@ -17,7 +17,7 @@ def db_close(db):
   db.close()
   print ('Connection closed')
 
-db = db_connect()
+# db = db_connect()
 
 # SELECT all movies from database
 def get_all_movies():
@@ -32,7 +32,7 @@ def get_all_movies():
   return movies
 
 # SELECT movies from database
-def get_movies(actor, genre, rating):
+def get_movies(db, actor, genre, rating):
   actor = "%" + actor + "%"
   genre = "%" + genre + "%"
 
@@ -67,7 +67,7 @@ def get_all_genres():
   return genres
 
 # SELECT genres for movie
-def get_genres(movie_id): 
+def get_genres(db, movie_id): 
   try:
     #db = db_connect()
     dbc = db.cursor()
@@ -240,4 +240,4 @@ def insert_all_movies(json_data):
 
         insert_movie_actor(movie_id, actor_id)
 
-db_close(db)
+# db_close(db)

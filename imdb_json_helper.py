@@ -8,11 +8,11 @@ def json_read(filename):
         data = json.load(json_data)
     return data
 
-def parse_movies(data):
+def parse_movies(db, data):
     movies = []
 
     for movie in data:
-        genres = get_genres(movie[0])
+        genres = get_genres(db, movie[0])
         release_date = movie[5].strftime("%d %B %Y")
         movies.append({
             'id':movie[0],
