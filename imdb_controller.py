@@ -26,12 +26,16 @@ def movies():
 
 @app.route('/getAllGenres')
 def genres():
-    genres = get_all_genres()
+    db = db_connect()
+    genres = get_all_genres(db)
+    db_close(db)
     return parse_genres(genres)
 
 @app.route('/getAllActors')
 def actors():
-    actors = get_all_actors()
+    db = db_connect()
+    actors = get_all_actors(db) 
+    db_close(db)
     return parse_actors(actors)
 
 app.run(debug=True)

@@ -55,7 +55,7 @@ def get_movies(db, actor, genre, rating):
   return movies
 
 # SELECT all genres from database
-def get_all_genres():
+def get_all_genres(db):
   try:
     #db = db_connect()
     dbc = db.cursor()
@@ -79,7 +79,7 @@ def get_genres(db, movie_id):
   return genres;  
 
 # SELECT all actors from database
-def get_all_actors():
+def get_all_actors(db):
   try:
     #db = db_connect()
     dbc = db.cursor()
