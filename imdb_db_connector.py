@@ -11,6 +11,11 @@ def db_connect():
       return db;
   except Error as e:
     print (e)
+       
+# close database connection
+def db_close(db):
+  db.close()
+  print ('Connection closed')
 
 db = db_connect()
 
@@ -234,8 +239,5 @@ def insert_all_movies(json_data):
           actor_id = insert_actor(actor_name, actor_id)
 
         insert_movie_actor(movie_id, actor_id)
-        
-# close database connection
-def db_close(db):
-  db.close()
-  print ('Connection closed')
+
+db_close(db)
