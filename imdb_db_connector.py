@@ -3,21 +3,6 @@ from mysql.connector import Error
 import datetime
 import json
 
-# Connect to local database
-def db_connect():
-    try:
-        db = mysql.connector.connect(
-            option_files = '.db_pref.cnf'
-        )
-        if db.is_connected():
-            print('Connected to IMDb database')
-            return db;
-    except Error as e:
-        print (e)
-
-def db_close(db):
-    db.close()
-    print ('Connection closed')
 
 # SELECT all movie ids
 def get_all_movie_ids():
@@ -160,7 +145,7 @@ def insert_all_movies():
 
             for actor in movie.get('actor_list'):
                 actor_name = actor.get('name')
-                actor_id = actor.get('id');
+                actor_id = actor.get('id')
                 actor_db_id = get_actor_id(actor_id)
                 if actor_db_id == []:
                     actor_id = insert_actor(actor_name, actor_id)
@@ -187,8 +172,8 @@ def json_dump(data):
 
 # TESTING ENVIRONMENT - work flow
 # BEGIN
-db = db_connect()
+# db = db_connect()
 # 1 read json file and add movies to db
-insert_all_movies()
+# insert_all_movies()
 # 2 close db connection
-db_close(db)
+# db_close(db)

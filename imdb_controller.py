@@ -14,7 +14,7 @@ def movies():
     if genre == None:
         genre = ""
     rating = request.args.get('rating')
-    if rating == None:
+    if rating == None or rating == '':
         rating = 0
 
     return get_movies(actor, genre, rating)
