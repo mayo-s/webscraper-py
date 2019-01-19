@@ -16,6 +16,7 @@ Sample Setup (using terminal - follow on your own risk ;-) )
 - (urllib and json libraries should already be included in your python3 installation)
 - install BeautifulSoup library > sudo pip install beautifulsoup4
 - install Flask > sudo pip install flask
+- add flask CORS > sudo pip install -U flask_cors
 
 - run scraper script > python3 imdb_scraper.py
   - will dump scraped data into json-file (imdb_data.json)
