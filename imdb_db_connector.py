@@ -40,7 +40,7 @@ def get_movies(db, actor, genre, rating):
     query = "SELECT DISTINCT j.* FROM (SELECT f.* FROM (SELECT m.* FROM movies m JOIN movieActors ma ON ma.id_movie = m.id JOIN actors a ON a.id = ma.id_actor AND a.name LIKE %s) as f JOIN movieGenres mg ON mg.id_movie = f.id JOIN genres g ON g.id = mg.id_genre AND g.genre LIKE %s) as j WHERE rating >= %s ORDER BY rating ASC"
     values = (actor, genre, rating)
   else:
-    query = "SELECT DISTINCT j.* FROM (SELECT f.* FROM (SELECT m.* FROM movies m JOIN movieActors ma ON ma.id_movie = m.id JOIN actors a ON a.id = ma.id_actor AND a.name LIKE %s) as f JOIN movieGenres mg ON mg.id_movie = f.id JOIN genres g ON g.id = mg.id_genre AND g.genre LIKE %s) as j WHERE rating >= %s OR rating IS NULL ORDER BY rating ASC"
+    query = "SELECT DISTINCT j.* FROM (SELECT f.* FROM (SELECT m.* FROM movies m JOIN movieActors ma ON ma.id_movie = m.id JOIN actors a ON a.id = ma.id_actor AND a.name LIKE %s) as f JOIN movieGenres mg ON mg.id_movie = f.id JOIN genres g ON g.id = mg.id_genre AND g.genre LIKE %s) as j WHERE rating >= %s OR rating IS NULL ORDER BY release_date ASC"
     values = (actor, genre, rating)
 
   movies = []
@@ -59,7 +59,7 @@ def get_all_genres(db):
   try:
     #db = db_connect()
     dbc = db.cursor()
-    dbc.execute("SELECT genre FROM genres")
+    dbc.execute("SELECT genre FROM genres ORDER BY genre ASC")
     genres = dbc.fetchall()
   except Error as e:
     print(e)
@@ -83,7 +83,7 @@ def get_all_actors(db):
   try:
     #db = db_connect()
     dbc = db.cursor()
-    dbc.execute("SELECT name FROM actors")
+    dbc.execute("SELECT name FROM actors ORDER BY name ASC")
     actors = dbc.fetchall()
   except Error as e:
     print(e)
