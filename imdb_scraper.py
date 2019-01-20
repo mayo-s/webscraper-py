@@ -5,7 +5,7 @@ import time
 from datetime import datetime
 
 start = time.time()
-initial_url = 'http://www.imdb.com/calendar?region=DE&ref_=rlm' # imdb calendar (Germany)
+initial_url = 'http://www.imdb.com/calendar?region=DE' # imdb calendar (Germany)
 
 def soup_maker(url):
     # download URL and extract content
