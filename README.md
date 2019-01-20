@@ -6,11 +6,11 @@ Scraped data will be written to a json file in project folder.
 
 Here is an example of what the scraped data looks like
 
-![alt text](https://github.com/mayo-s/webscraper-py/blob/master/sample_print.png)
+![alt text](https://github.com/mayo-s/webscraper-py/blob/master/img/sample_print.png)
 
 ## Database
   
-![alt text](https://github.com/mayo-s/webscraper-py/blob/master/imdb_scraper_db-model-02.png)
+![alt text](https://github.com/mayo-s/webscraper-py/blob/master/img/imdb_scraper_db-model.png)
   
 ## Setup instructions
 (using terminal - follow on your own risk ;-) )  
