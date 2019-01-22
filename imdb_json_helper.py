@@ -4,10 +4,12 @@ from imdb_db_connector import get_genres
 
 # read JSON file
 def json_read(filename):
+    print('Reading JSON file...')
     with open(filename) as json_data:
         data = json.load(json_data)
     return data
 
+# parse movies to JSON
 def parse_movies(db, data):
     movies = []
 
@@ -26,6 +28,7 @@ def parse_movies(db, data):
     movies = json.dumps(movies)
     return jsonify(movies)
 
+# parse genres to JSON
 def parse_genres(data):
     genres = []
     for genre in data:
@@ -33,6 +36,7 @@ def parse_genres(data):
     genres = json.dumps(genres)
     return jsonify(genres)
 
+# parse actors to JSON
 def parse_actors(data):
     actors = []
     for actor in data:

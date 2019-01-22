@@ -4,9 +4,6 @@ import json
 import time
 from datetime import datetime
 
-start = time.time()
-initial_url = 'http://www.imdb.com/calendar?region=DE' # imdb calendar (Germany)
-
 def soup_maker(url):
     # download URL and extract content
     request = urllib.request.Request(url)
@@ -14,12 +11,6 @@ def soup_maker(url):
     # pass HTML to BeautifulSoup
     soup = BeautifulSoup(html, 'html.parser')
     return soup
-
-# scrape calendar
-print ("IMDb Calendar scraping in progress... ")
-soup = soup_maker(initial_url)
-calendar = soup.find('div', attrs={'id':'main'})
-links = calendar.find_all('a')
 
 # extract specific movie information
 def parse_movie(url):
@@ -93,67 +84,67 @@ def parse_movie(url):
     }
     return data
 
-# from each link extract text of link, id and link itself
-print ('Movie scraping in progress... ')
-upcoming_movies = []
-for link in links:
-    title = link.text
-    url = link['href']
-
-    # extract unique movie id from url (/title/tt<id>/?ref_=rlm)
-    imdb_id = url.split('/')[2]
-    imdb_id = imdb_id.replace('tt', '')
-
-    # build url
-    if not url.startswith('http'):
-        url = 'https://www.imdb.com' + url
-
-    # parse each movie
-    info = parse_movie(url)
-
-    movie = {
-        'imdb_id':imdb_id,
-        'title':title,
-        'url':url,
-        'genres':info.get('genres'),
-        'rating':info.get('rating'),
-        'release_date':info.get('release_date'),
-        'poster_url':info.get('poster_url'),
-        'actor_list_url':info.get('actor_list_url'),
-        'actor_list':info.get('actors')
-    }
-    upcoming_movies.append(movie)
-
-# write data to json file
-with open('imdb_data.json', 'w') as outfile:
-    json.dump(upcoming_movies, outfile, indent=4, default=str)
-print('Scraped data dumped into imdb_data.json')
-
 def time_format(num):
     return ('%.1f' % num).rstrip('0').rstrip('.')
 
-def print_statistics():
+def print_statistics(upcoming_movies, start, end):
     print ('')
     print ('#################################')
     print ('####      IMDb Scraper       ####')
     text = '#### Movies scraped:    ' + str(len(upcoming_movies)) + '   ####'
     print (text)
-    end = time.time()
     t = time_format(end - start)
     text = '#### Time needed: ' + str(t) + ' secs ####'
     print (text)
     print ('#################################')
     print('')
 
-# print scraped data
-def print_all_data():
-    for movie in upcoming_movies:
-        print('')
-        print(movie.get('title'))
-        print(movie.get('url'))
-        print(movie.get('genres'))
-        print(movie.get('release_date'))
-        # print(movie.get('rating'))
+def scrape():
+    start = time.time()
+    initial_url = 'http://www.imdb.com/calendar?region=DE' # imdb calendar (Germany)
 
-print_statistics()
-# print_all_data()
+    # scrape calendar
+    print ("IMDb Calendar scraping in progress... ")
+    soup = soup_maker(initial_url)
+    calendar = soup.find('div', attrs={'id':'main'})
+    links = calendar.find_all('a')
+
+    # from each link extract text of link, id and link itself
+    print ('Movie scraping in progress... ')
+    upcoming_movies = []
+    for link in links:
+        title = link.text
+        url = link['href']
+
+        # extract unique movie id from url (/title/tt<id>/?ref_=rlm)
+        imdb_id = url.split('/')[2]
+        imdb_id = imdb_id.replace('tt', '')
+
+        # build url
+        if not url.startswith('http'):
+            url = 'https://www.imdb.com' + url
+
+        # parse each movie
+        info = parse_movie(url)
+
+        movie = {
+            'imdb_id':imdb_id,
+            'title':title,
+            'url':url,
+            'genres':info.get('genres'),
+            'rating':info.get('rating'),
+            'release_date':info.get('release_date'),
+            'poster_url':info.get('poster_url'),
+            'actor_list_url':info.get('actor_list_url'),
+            'actor_list':info.get('actors')
+        }
+        upcoming_movies.append(movie)
+
+    # write data to json file
+    with open('imdb_data.json', 'w') as outfile:
+        json.dump(upcoming_movies, outfile, indent=4, default=str)
+    print('Scraped data dumped into imdb_data.json')
+
+    end = time.time()
+    print_statistics(upcoming_movies, start, end)
+    return 'imdb_data.json'

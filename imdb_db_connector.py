@@ -17,20 +17,6 @@ def db_close(db):
   db.close()
   print ('Connection closed')
 
-# db = db_connect()
-
-# SELECT all movies from database
-def get_all_movies():
-  try:
-    #db = db_connect()
-    dbc = db.cursor()
-    dbc.execute("SELECT * FROM movies")
-    movies = dbc.fetchall()
-  except Error as e:
-    print(e)
-
-  return movies
-
 # SELECT movies from database
 def get_movies(db, actor, genre, rating):
   actor = "%" + actor + "%"
@@ -45,7 +31,6 @@ def get_movies(db, actor, genre, rating):
 
   movies = []
   try:
-    #db = db_connect()
     dbc = db.cursor()
     dbc.execute(query, values)
     movies = dbc.fetchall()
@@ -57,7 +42,6 @@ def get_movies(db, actor, genre, rating):
 # SELECT all genres from database
 def get_all_genres(db):
   try:
-    #db = db_connect()
     dbc = db.cursor()
     dbc.execute("SELECT genre FROM genres ORDER BY genre ASC")
     genres = dbc.fetchall()
@@ -69,7 +53,6 @@ def get_all_genres(db):
 # SELECT genres for movie
 def get_genres(db, movie_id): 
   try:
-    #db = db_connect()
     dbc = db.cursor()
     dbc.execute("SELECT genres.genre FROM movieGenres INNER JOIN genres ON movieGenres.id_genre = genres.id WHERE movieGenres.id_movie = %s", (movie_id,))
     genres = dbc.fetchall()
@@ -81,7 +64,6 @@ def get_genres(db, movie_id):
 # SELECT all actors from database
 def get_all_actors(db):
   try:
-    #db = db_connect()
     dbc = db.cursor()
     dbc.execute("SELECT name FROM actors ORDER BY name ASC")
     actors = dbc.fetchall()
@@ -91,10 +73,9 @@ def get_all_actors(db):
   return actors
 
 # SELECT all movie ids
-def get_all_movie_ids():
+def get_all_movie_ids(db):
   ids = []
   try:
-    #db = db_connect()
     dbc = db.cursor()
     dbc.execute('SELECT imdb_id FROM movies')
     ids = dbc.fetchall()
@@ -103,9 +84,8 @@ def get_all_movie_ids():
       print(e)
 
 # SELECT movie id by imdb_id
-def get_movie_id(imdb_id):
+def get_movie_id(db, imdb_id):
   try:
-    #db = db_connect()
     dbc = db.cursor()
     dbc.execute('SELECT id FROM movies WHERE imdb_id = \'' + imdb_id + '\'')
     movie_id = dbc.fetchall()
@@ -116,9 +96,8 @@ def get_movie_id(imdb_id):
     print(e)
 
 # SELECT genre id by genre name
-def get_genre_id(genre):
+def get_genre_id(db, genre):
   try:
-    #db = db_connect()
     dbc = db.cursor()
     dbc.execute('SELECT id FROM genres WHERE genre = \'' + genre + '\'')
     genre_id = dbc.fetchall()
@@ -129,9 +108,8 @@ def get_genre_id(genre):
     print(e)
 
 # SELECT actor id by imdb_id
-def get_actor_id(imdb_id):
+def get_actor_id(db, imdb_id):
   try:
-    #db = db_connect()
     dbc = db.cursor()
     dbc.execute('SELECT id FROM actors WHERE imdb_id = \'' + imdb_id + '\'')
     actor_id = dbc.fetchall()
@@ -142,11 +120,10 @@ def get_actor_id(imdb_id):
     print(e)
 
 # INSERT new movie dataset
-def insert_movie(title, imdb_id, url, image_url, release_date, rating):
+def insert_movie(db, title, imdb_id, url, image_url, release_date, rating):
   sql = "INSERT INTO movies (title, imdb_id, url, image_url, release_date, rating) VALUES (%s, %s, %s, %s, %s, %s)"
   val = (title, imdb_id, url, image_url, release_date, rating)
   try:
-    #db = db_connect()
     dbc = db.cursor()
     dbc.execute(sql, val)
     movie_id = dbc.lastrowid
@@ -156,11 +133,10 @@ def insert_movie(title, imdb_id, url, image_url, release_date, rating):
     print(e)
 
 # INSERT new genre
-def insert_genre(genre):
+def insert_genre(db, genre):
   sql = "INSERT INTO genres (genre) VALUES (%s)"
   val = (genre,)
   try:
-    #db = db_connect()
     dbc = db.cursor()
     dbc.execute(sql, val)
     genre_id = dbc.lastrowid
@@ -170,11 +146,10 @@ def insert_genre(genre):
     print(e)
 
 # INSERT new actor dataset
-def insert_actor(name, imdb_id):
+def insert_actor(db, name, imdb_id):
   sql = "INSERT INTO actors (imdb_id, name) VALUES (%s, %s)"
   val = (imdb_id, name)
   try:
-    #db = db_connect()
     dbc = db.cursor()
     dbc.execute(sql, val)
     actor_id = dbc.lastrowid
@@ -184,11 +159,10 @@ def insert_actor(name, imdb_id):
     print(e)
 
 # INSERT new movie genre
-def insert_movie_genre(movie_id, genre_id):
+def insert_movie_genre(db, movie_id, genre_id):
   sql = "INSERT INTO movieGenres (id_genre, id_movie) VALUES (%s, %s)"
   val = (genre_id, movie_id)
   try:
-    #db = db_connect()
     dbc = db.cursor()
     dbc.execute(sql, val)
     db.commit()
@@ -196,11 +170,10 @@ def insert_movie_genre(movie_id, genre_id):
     print(e)
 
 # INSERT new movie actor
-def insert_movie_actor(movie_id, actor_id):
+def insert_movie_actor(db, movie_id, actor_id):
   sql = "INSERT INTO movieActors (id_actor, id_movie) VALUES (%s, %s)"
   val = (actor_id, movie_id)
   try:
-    #db = db_connect()
     dbc = db.cursor()
     dbc.execute(sql, val)
     db.commit()
@@ -208,13 +181,13 @@ def insert_movie_actor(movie_id, actor_id):
     print(e)
 
 # INSERT all movies from JSON file
-def insert_all_movies(json_data):
+def insert_all_movies(db, json_data):
   print("Adding new movies...")
   upcoming_movies = json_data
-  db_movie_ids = get_all_movie_ids();
+  db_movie_ids = get_all_movie_ids(db);
 
   for movie in upcoming_movies:
-    movie_id = get_movie_id(movie.get('imdb_id'))
+    movie_id = get_movie_id(db, movie.get('imdb_id'))
     if movie_id == []:
       title = movie.get('title')
       imdb_id = movie.get('imdb_id')
@@ -222,22 +195,20 @@ def insert_all_movies(json_data):
       image_url = movie.get('poster_url')
       release_date = movie.get('release_date')
       rating = movie.get('rating')
-      movie_id = insert_movie(title, imdb_id, url, image_url, release_date, rating)
+      movie_id = insert_movie(db, title, imdb_id, url, image_url, release_date, rating)
 
       for genre in movie.get('genres'):
-        genre_id = get_genre_id(genre)
+        genre_id = get_genre_id(db, genre)
         if genre_id == []:
-          genre_id = insert_genre(genre)
+          genre_id = insert_genre(db, genre)
 
-        insert_movie_genre(movie_id, genre_id)
+        insert_movie_genre(db, movie_id, genre_id)
 
       for actor in movie.get('actor_list'):
         actor_name = actor.get('name')
         actor_id = actor.get('id')
-        actor_db_id = get_actor_id(actor_id)
+        actor_db_id = get_actor_id(db, actor_id)
         if actor_db_id == []:
-          actor_id = insert_actor(actor_name, actor_id)
+          actor_id = insert_actor(db, actor_name, actor_id)
 
-        insert_movie_actor(movie_id, actor_id)
-
-# db_close(db)
+        insert_movie_actor(db, movie_id, actor_id)
